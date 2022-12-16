@@ -1,118 +1,100 @@
-
-function ColorSwatch(sid, r, g, b) {
-	
-	this.swatchID = sid;
-	
-
-	this.red = r;
-	this.green = g;
-	this.blue = b;
-	
-	
-	this.displaySwatch = function() {
-		
-
-		swatchObj = document.getElementById(this.swatchID);
-		
-	
-		swatchHex = rgbToHex(this.red, this.green, this.blue);
-		
-	
-		swatchObj.style.backgroundColor = "#" + swatchHex;
-		
-
-		swatchText = document.querySelector("#" + this.swatchID + " p");
-		swatchText.innerHTML = "#" + swatchHex;
-		
-	
-		location.hash = swatchHex;
-
-	
-		colorAvg = (this.red + this.green + this.blue)/3;
-		if (colorAvg < 128) swatchText.classList.add("lite");
-		else swatchText.classList.remove("lite");
-		
-	} 
-	
-	
-	
-	this.randomColor = function() {
-		this.red = randomColorVal();
-		this.green = randomColorVal();
-		this.blue = randomColorVal();
-		this.displaySwatch();
-	}
-	
-
-	
-} 
-
-
-window.onload = function() {
-	
-	urlHex = location.hash;
-	console.log("Passed hash: " + urlHex);
-	
-	if (urlHex != "") {
-		urlHexConverted = hexToRgb(urlHex); 
-		passedRed = urlHexConverted.r;
-		passedGreen = urlHexConverted.g;
-		passedBlue = urlHexConverted.b;
-	} else {
-		passedRed = randomColorVal();
-		passedGreen = randomColorVal();
-		passedBlue = randomColorVal();
+class Colour {
+	constructor(hex, element) {
+		this.hex = hex;
+		this.element = element;
+		this.locked = false;
 	}
 
-	Swatch1 = new ColorSwatch("colorSwatch1", passedRed, passedGreen, passedBlue);
-	Swatch1.displaySwatch();
-  
-
-	document.getElementById("colorSwatch1").onclick = function() {
-		console.log("clicked");
-		Swatch1.randomColor();
-
-	}
-  
-   Swatch2 = new ColorSwatch("colorSwatch2", passedRed, passedGreen, passedBlue);
-	Swatch2.displaySwatch();
-  
-  	document.getElementById("colorSwatch2").onclick = function() {
-		console.log("clicked");
-		Swatch2.randomColor();
-
-	}
-   Swatch3 = new ColorSwatch("colorSwatch3", passedRed, passedGreen, passedBlue);
-	Swatch3.displaySwatch();
-  
-  	document.getElementById("colorSwatch3").onclick = function() {
-		console.log("clicked");
-		Swatch3.randomColor();
-
-	}
-     Swatch4 = new ColorSwatch("colorSwatch4", passedRed, passedGreen, passedBlue);
-	Swatch4.displaySwatch();
-  
-  	document.getElementById("colorSwatch4").onclick = function() {
-		console.log("clicked");
-		Swatch4.randomColor();
-
+	setHex(hex) {
+		this.hex = hex;
+		this.element.style.backgroundColor = hex;
+		this.element.querySelector(".colour-input").value = hex;
 	}
 
-	     
-	document.onkeydown = function(event) {
-		k = event.keyCode; 
-		if (k == 32) {
-			console.log("key: space");
-			Swatch1.randomColor();
-      Swatch2.randomColor();
-      Swatch3.randomColor();
-      Swatch4.randomColor();
-     
-      
+	setLocked(locked) {
+		this.locked = locked;
 
+		if (locked) {
+			this.element
+				.querySelector(".lock-toggle")
+				.classList.add("is-locked");
+
+			this.element
+				.querySelector("img")
+				.src = "icons/lock-closed.svg";
+		} else {
+			this.element
+				.querySelector(".lock-toggle")
+				.classList.remove("is-locked");
+
+			this.element
+				.querySelector("img")
+				.src = "icons/lock-open.svg";
 		}
-	} 
- 
+	}
+
+	toggleLocked() {
+		this.setLocked(!this.locked);
+	}
+
+	generateHex() {
+		if (this.locked) {
+			return
+		}
+		
+		const chars = "0123456789ABCDEF";
+		let color = "#";
+		for (let i = 0; i < 6; i++) {
+			color += chars[Math.floor(Math.random() * 16)];
+		}
+		
+		this.setHex(color);
+	}
+
+	copyToClipboard() {
+		const input = this.element.querySelector(".colour-input");
+		input.select();
+		document.execCommand("copy");
+		input.blur();
+
+		this.element.classList.add("copied");
+		setTimeout(() => {
+			this.element.classList.remove("copied");
+		}, 1000);
+	}
 }
 
+const colour_elements = document.querySelectorAll('.colours .colour');
+
+const colours = [];
+
+for (let i = 0; i < colour_elements.length; i++) {
+	const colour_element = colour_elements[i];
+
+	const input = colour_element.querySelector(".colour-input");
+	const lock_toggle = colour_element.querySelector(".lock-toggle");
+	const copy_btn = colour_element.querySelector(".copy-hex");
+
+	const hex = input.value;
+
+	const colour = new Colour(hex, colour_element);
+
+	input.addEventListener('input', (e) => colour.setHex(e.target.value));
+	lock_toggle.addEventListener('click', () => colour.toggleLocked());
+	copy_btn.addEventListener('click', () => colour.copyToClipboard());
+
+	colour.generateHex();
+	colours.push(colour);
+}
+
+document.querySelector(".generator-button").addEventListener("click", () => {
+	for (let i = 0; i < colours.length; i++) {
+		colours[i].generateHex();
+	}
+});
+
+document.addEventListener('keypress', (e) => {
+	if (e.code.toLowerCase() === "space") {
+		document.querySelector(".generator-button").click();
+	}
+})
