@@ -1,0 +1,69 @@
+
+body {
+  margin: 0;
+  background-color: #303030;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Gill Sans, sans-serif;
+  padding: 2em;
+}
+
+.swatches {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+  transition: background-color 1s;
+}
+
+.swatches p {
+  font-size: 90%;
+  color: #000;
+  transition: color 1s;
+}
+
+.swatches p.lite {
+  color: #fff;
+}
+
+#colorSwatch1 {
+  position: absolute;
+  height: 40vh;
+  width: 20vw;
+  top: 30;
+  left: 0%;
+}
+
+/* second swatch */
+
+#colorSwatch2 {
+  position: absolute;
+  height: 40vh;
+  width: 20vw;
+  top: 30;
+  left: 25%;
+}
+
+/* third swatch */
+
+#colorSwatch3 {
+  position: absolute;
+  height: 40vh;
+  width: 20vw;
+  top: 30;
+  left: 50%;
+}
+
+/* 4 swatch */
+
+#colorSwatch4 {
+  position: absolute;
+  height: 40vh;
+  width: 20vw;
+  top: 30;
+  left: 75%;
+}
